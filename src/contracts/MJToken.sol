@@ -1,9 +1,9 @@
 pragma solidity ^0.5.0;
 
-contract DappToken {
-    string  public name = "DApp Token";
-    string  public symbol = "DAPP";
-    uint256 public totalSupply = 1000000000000000000000000; // 1 million tokens
+contract MJToken {
+    string  public name = "MJ Token";
+    string  public symbol = "MJ";
+    uint256 public totalSupply = 10000000000000000000000000; // 10 million tokens
     uint8   public decimals = 18;
 
     event Transfer(
@@ -35,13 +35,13 @@ contract DappToken {
 
     function approve(address _spender, uint256 _value) public returns (bool success) {
         allowance[msg.sender][_spender] = _value;
-        //emit Approval(msg.sender, _spender, _value);
+        emit Approval(msg.sender, _spender, _value);
         return true;
     }
 
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
         require(_value <= balanceOf[_from]);
-        //require(_value <= allowance[_from][msg.sender]);
+        require(_value <= allowance[_from][msg.sender]);
         balanceOf[_from] -= _value;
         balanceOf[_to] += _value;
         allowance[_from][msg.sender] -= _value;

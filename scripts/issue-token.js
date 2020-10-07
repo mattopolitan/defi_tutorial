@@ -1,9 +1,25 @@
-const TokenFarm = artifacts.require('TokenFarm')
+// const TokenFarm = artifacts.require('TokenFarm')
+//
+// module.exports = async function(callback) {
+//     let tokenFarm = await TokenFarm.deployed()
+//     await tokenFarm.issueToken()
+//
+//
+//     // Code goes here...
+//     console.log("Tokens issued!")
+//
+//     callback()
+// };
+
+const MJTokenStakeReward = artifacts.require('MJTokenStakeReward')
 
 module.exports = async function(callback) {
-  let tokenFarm = await TokenFarm.deployed()
-  await tokenFarm.issueTokens()
-  // Code goes here...
-  console.log("Tokens issued!")
-  callback()
-}
+    let mjTokenStakeReward = await MJTokenStakeReward.deployed()
+    await mjTokenStakeReward.issueToken()
+
+
+    // Code goes here...
+    console.log("Tokens issued!")
+
+    callback()
+};

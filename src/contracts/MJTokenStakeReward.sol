@@ -1,37 +1,21 @@
 pragma solidity ^0.5.0;
 
-import "./DappToken.sol";
-import "./DaiToken.sol";
+import "./MJToken.sol";
 
-contract TokenFarm {
-    string public name = "Dapp Token Farm";
-    DappToken public dappToken;
-    DaiToken public daiToken;
+contract MJTokenStakeReward {
+    string public name = "MJ Token Stake Reward";
+    MJToken public mjToken;
     address public owner;
-
-    /*
-    struct stakingInfo {
-        uint amount;
-        bool requested;
-        uint releaseDate;
-    }
-    */
 
     address[] public stakers;
     mapping(address => uint) public stakingBalance;
+    mapping(address => uint) public rewardBalance;
     mapping(address => bool) public hasStaked;
     mapping(address => bool) public isStaking;
 
-    /*
-    mapping (address => mapping(address => stakingInfo)) public StakeMap; //tokenAddr to user to stake amount
-    mapping (address => mapping(address => uint)) public userCummRewardPerStake; //tokenAddr to user to remaining claimable amount per stake
-    mapping (address => uint) public tokenCummRewardPerStake; //tokenAddr to cummulative per token reward since the beginning or time
-    mapping (address => uint) public tokenTotalStaked; //tokenAddr to total token claimed
-    */
 
-    constructor(DappToken _dappToken, DaiToken _daiToken) public {
-        dappToken = _dappToken;
-        daiToken = _daiToken;
+    constructor(MJToken _mjToken) public {
+        mjToken = _mjToken;
         owner = msg.sender;
     }
 
@@ -41,7 +25,7 @@ contract TokenFarm {
         require(_amount > 0, "amount cannot be 0");
 
         // Transfer Mock Dai tokens to this contract for staking
-        daiToken.transferFrom(msg.sender, address(this), _amount);
+        mjToken.transferFrom(msg.sender, address(this), _amount);
 
         // Update staking balance
         stakingBalance[msg.sender] = stakingBalance[msg.sender] + _amount;
@@ -59,22 +43,29 @@ contract TokenFarm {
 
     // Unstaking Tokens (Withdraw)
     function unstakeTokens() public {
-        //Fetching staking balance
+        //Fetching staking & reward balance
         uint balance = stakingBalance[msg.sender];
+        uint reward = rewardBalance[msg.sender];
 
         // Require amount greater than 0
         require(balance > 0, "staking balance cannot be 0");
+        //require(reward > 0, "reward balance cannot be 0");
 
-        // Transfer Mock Dai tokens to this contract for staking
-        daiToken.transfer(msg.sender, balance);
+        uint transferAmount = balance + reward;
 
-        // Reset staking balance
+        // Transfer MJ tokens to unstaker
+        mjToken.transfer(msg.sender, transferAmount);
+
+        // Transfer reward
+        //mjToken.transfer(msg.sender, reward);
+
+        // Reset staking balance & reward
         stakingBalance[msg.sender] = 0;
+        rewardBalance[msg.sender] = 0;
 
         // Update staking status
         isStaking[msg.sender] = false;
     }
-
 
     // Issuing Tokens
     function issueToken() public{
@@ -84,11 +75,20 @@ contract TokenFarm {
         for (uint i=0; i<stakers.length; i++){
             address recipient = stakers[i];
             uint balance = stakingBalance[recipient];
+            rewardBalance[recipient] = rewardBalance[recipient] + balance;
+
+            // mjToken.approve(msg.sender, rewardBalance[recipient] + stakingBalance[recipient]);
+
             if( balance > 0){
-                dappToken.transfer(recipient, balance);
-                //daiToken.transfer(recipient, balance);
+            //    mjToken.transfer(recipient, balance);
+                //mjToken.approve(msg.sender, rewardBalance[recipient] + stakingBalance[recipient]);
             }
         }
+
+    }
+
+    // Return Reward Token value
+    function returnRewardValue(address _address) public {
 
     }
 
